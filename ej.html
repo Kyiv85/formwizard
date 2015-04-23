@@ -3,10 +3,8 @@
 <script type="text/javascript">
 		$(function(){
 			
-
 			var currentStep = 1;
 			var totalPorc = 0;
-
 		        // Form de inserción de nuevos elementos
 	    	  	$("#encuestaForm").formwizard({ //wizard settings
 				 	formPluginEnabled: true, //Ajax is used to post the form to the server
@@ -14,10 +12,8 @@
 				 	focusFirstInput : true, // puts focus at the first input on each step
 				 	textSubmit: "Ver Resumen",
 				 	beforeNext: function(wizardData){
-
 				 		// valor total del grid
 				 		var values = jQuery("#list_"+currentStep).jqGrid('footerData');
-
 				 		//if(parseInt(values['cell.DQF']) == 0 || parseInt(values['cell.DQF']) == 100){
 				 		if(parseInt(values['cell.DQF']) <= 100){
 				 			if(wizardData.backwards != true)
@@ -37,23 +33,17 @@
 				 		}
 				 	},
 				 	afterNext : function(wizardData){
-
 						next = $("li.current").next();
 						current = $("li.current");
 						prev = current.prev();
-
 						current.removeClass('current').addClass('lastDone');
                         next.addClass('current');
-
                         if(prev.length != 0){
     						prev.removeClass('lastDone').addClass('done');
                                                     }
-
                         return false;
-
 				 	},
 				 	afterBack : function(wizardData){
-
 						prev = $("li.current").prev();
 						$("li.current").removeClass('current')
 						prev.removeClass().addClass('current');
@@ -64,15 +54,15 @@
 				 {
 					messages: {}
 				 },
-				 {*/
+				 {
 				   remoteAjax: {
 
-				   },
+				   },*/
 				   formOptions: {
 				   	success: function(data){ // called when the form has been submitted correctly to the server
+				   		confirm("Está seguro?");
 				   	},
       				beforeSubmit:  function(wizardData){
-
 				   		if(totalPorc < 100){
 				 			$("#status_"+currentStep).text('El total debe ser 100')
 				 			                         .css("color","red")
@@ -81,16 +71,40 @@
 				 			                         .fadeTo("5000",0);
 				 			return false;
 				 		}
+				 		else
 				   	},
 				   	dataType: 'json',
 				   	resetForm: false
 				   }
 				});
 
+				var remoteAjax = {}; // empty options object
+
+				$("#encuestaForm.step").each(function(){ // for each step in the wizard, add an option to the remoteAjax object...
+					remoteAjax[$(this).attr("id")] = {
+					 url : '/SASWeb/application/showencuestasummaryestadistico?idPermiso=35&dimFuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA', // the url which stores the stuff in db for each step
+					 contentType: "application/json; charset=utf-8",
+					 dataType : 'json',
+					 beforeSubmit:  function(wizardData){
+				   		if(totalPorc < 100){
+				 			$("#status_"+currentStep).text('El total debe ser 100')
+				 			                         .css("color","red")
+				 			                         .fadeTo("fast",100)
+				 			                         .delay(1600)
+				 			                         .fadeTo("5000",0);
+				 			return false;
+				 		}
+				   	 },
+					 success: function(wizardData){ // called when the form has been submitted correctly to the server
+				   	 	confirm("Está seguro?");
+				   	 },
+					};
+				});
+
+				//$("#encuestaForm").formwizard("option", "remoteAjax", remoteAjax);
 
 	    	     // Grids respectivos por cada pregunta
 	    	  	#{list items:encuesta.encuestas, as:'encu'}
-
 				jQuery("[id='list_${encu_index}']").jqGrid({
 					url:'/SASWeb/func/encList/${perm?.id}/${encu?.id}?fuente=${dimFuente}&conductor=${encu?.nombreConductor.urlEncode()}',
 					datatype: "json",
@@ -124,7 +138,6 @@
 						}
 					}
 				});
-
 				jQuery("#ed1").click( function() {
 				
 	            jQuery("[id='list_${encu_index}']").jqGrid('editRow',id=jQuery("[id='list_${encu_index}']").jqGrid("getGridParam", "selarrrow"));
@@ -150,10 +163,7 @@
 
 
 
-
-
-
-
+                
 				//Funcion para modificar DQF
 				jQuery("#sved1").click( function() {
 	            var parent = $(this).closest("span");
@@ -177,7 +187,6 @@
                     	   success: function(data){
       					     if(data.success == 'true' ){
     					    	 jQuery("[id='list_${encu_index}']").trigger("reloadGrid");
-
     	      					 $('#status_${encu_index}').text('El registro fue Modificado')
 		                                                   .css("color","green")
 		                                                   .fadeTo("fast",100)
@@ -212,15 +221,10 @@
 	            jQuery("#sved1,#cned1").attr("disabled",true);
 	            jQuery("#ed1").attr("disabled",false);
                     });
-
-
                 //Borrar fila
 				$("#dedata_${encu_index}").click(function(){
-
 					var gr = jQuery("[id='list_${encu_index}']").jqGrid('getGridParam','selarrrow');
-
 					
-
 					if( gr != null )
 						jQuery("[id='list_${encu_index}']").jqGrid('delGridRow',gr,{reloadAfterSubmit:true,
 							bSubmit: "Borrar",
@@ -236,19 +240,14 @@
 						                         .delay(1600)
 						                         .fadeTo("5000",0);
 				});
-
 				#{/list}
-
 				
 				//Insertar registro
 			  #{list items:encuesta.encuestas, as:'encu'}
-
 				$(".addItem_${encu_index}").click(function() {
 					// get the parent form
 					var parent = $(this).closest("span");
                     var formData = $(".actividad", parent).serializeArray();
-
-
                     $.ajax({
                     	   type: "GET",
                     	   url: "/SASWeb/application/insertencuestarowdataestadistico?&idPermiso=${perm?.id}&idPregunta=${encu?.id}&dimFuente=${dimFuente}",
@@ -257,7 +256,6 @@
                     	   success: function(data){
       					     if(data.success == 'true' ){
     					    	 jQuery("[id='list_${encu_index}']").trigger("reloadGrid");
-
     	      					 $('#status_${encu_index}').text('El registro fue insertado')
 		                                                   .css("color","green")
 		                                                   .fadeTo("fast",100)
@@ -271,12 +269,6 @@
 		                    	                              .fadeTo("5000",0);
                            	  }
 		                    },
-
-
-
-
-
-
     						error: function(xhr, msg, error){
      							$('#status_${encu_index}').text('El registro no pudo ser insertado')
      							                          .css("color","red")
@@ -285,23 +277,17 @@
      							                          .fadeTo("5000",0);
        						}
                     	 });
-
                	 	});
-
 				#{/list}
-
 				$(".Porcentaje").spinbox({
 					  min: 0,	   // Set lower limit or null for no limit.
 					  max: 100,  // Set upper limit or null for no limit.
 					  step: 1	 // Set increment size.
 				});
-
-
 				$('.Bolivares').numeric({allow:"."});
 				$('.Entero').numeric({allow:"."});
-
 			});
-				</script>
+</script>
 <div id="crudShow" class="">
 
 
@@ -382,4 +368,3 @@
 
 	<p id="data"></p>
 </div>
-
