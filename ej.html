@@ -5,23 +5,39 @@
 			
 			var currentStep = 1;
 			var totalPorc = 0;
-		        // Form de inserción de nuevos elementos
-	    	  	$("#encuestaForm").formwizard({ //wizard settings
-				 	formPluginEnabled: false, //Ajax is used to post the form to the server
-				 	validationEnabled : true, //The Validation plugin is used for validating the form at each step
-				 	focusFirstInput : true, // puts focus at the first input on each step
-				 	textSubmit: "Ver Resumen",
-				 	beforeNext: function(wizardData){
-				 		// valor total del grid
-				 		var values = jQuery("#list_"+currentStep).jqGrid('footerData');
+		    // Form de inserción de nuevos elementos
+	    	$("#encuestaForm").formwizard({ //wizard settings
+			 	formPluginEnabled: true, //Ajax is used to post the form to the server
+			 	validationEnabled : true, //The Validation plugin is used for validating the form at each step
+			 	focusFirstInput : true, // puts focus at the first input on each step
+			 	textSubmit: "Ver Resumen",
+			 	beforeNext: function(wizardData){
+			 		//Valor total del grid
+			 		var values = jQuery("#list_"+currentStep).jqGrid('footerData');
+			 			console.log("currentStep:"+currentStep);
+				 		console.log("Porcentaje:"+totalPorc);
+				 		console.log("totalGen:"+totalGen);
+				 		console.log("activatedSteps:"+wizardData.activatedSteps);
+				 		console.log("isLastStep:"+wizardData.isLastStep);
+				 		console.log("previousStep:"+wizardData.previousStep);
 				 		//if(parseInt(values['cell.DQF']) == 0 || parseInt(values['cell.DQF']) == 100){
+				 		if(wizardData.isLastStep){
+				 			totalGen = currentStep*100;
+				 			totalPorc = totalPorc+parseInt(values['cell.DQF']);
 
-				 		if(lastStep){
-				 			if(parseInt(values['cell.DQF']) == 0 || parseInt(values['cell.DQF']) == 100){
+				 			console.log("currentStep:"+currentStep);
+				 			console.log("Porcentaje:"+totalPorc);
+				 			console.log("totalGen:"+totalGen);
+				 			console.log("activatedSteps:"+wizardData.activatedSteps);
+				 			console.log("isLastStep:"+wizardData.isLastStep);
+				 			console.log("previousStep:"+wizardData.previousStep);
+				 			
+							if(totalGen == totalPorc){
+								//$("#encuestaForm").submit()
 				 				return true;
 				 			}
 				 			else{
-				 			$("#status_"+currentStep).text('El total no es 0 ni suma 100')
+				 			$("#status_"+currentStep).text('Las encuestas no están al 100%')
 				 			                         .css("color","red")
 				 			                         .fadeTo("fast",100)
 				 			                         .delay(1600)
@@ -36,7 +52,8 @@
 				 				console.log("currentStep:"+currentStep);
 				 				totalPorc = parseInt(values['cell.DQF']);
 				 				console.log("Porcentaje:"+totalPorc);
-				 				//console.log("Pasos:"+lastStep);
+				 				console.log("activatedSteps:"+wizardData.activatedSteps);
+				 				console.log("isLastStep:"+wizardData.isLastStep);
 				 				return true;
 				 			}
 				 			else{
@@ -58,7 +75,7 @@
                         next.addClass('current');
                         if(prev.length != 0){
     						prev.removeClass('lastDone').addClass('done');
-                                                    }
+                        }
                         return false;
 				 	},
 				 	afterBack : function(wizardData){
@@ -78,50 +95,15 @@
 				   },*/
 				   formOptions: {
 				   	success: function(data){ // called when the form has been submitted correctly to the server
-
 				   	},
       				beforeSubmit:  function(data){
-				   		/*if(totalPorc < 100){
-				 			$("#status_"+currentStep).text('El total debe ser 100')
-				 			                         .css("color","red")
-				 			                         .fadeTo("fast",100)
-				 			                         .delay(1600)
-				 			                         .fadeTo("5000",0);
-				 			return false;
-				 		}
-				 		else{
-							return true;
-				 		}*/
-				   	},
+
+				 	},
 				   	dataType: 'json',
 				   	resetForm: false
 				   }
 				});
 
-				/*var remoteAjax = {}; // empty options object
-
-				$("#encuestaForm.step_${encu_index}").each(function(){ // for each step in the wizard, add an option to the remoteAjax object...
-					remoteAjax[$(this).attr("id")] = {
-					 url : '/SASWeb/application/showencuestasummaryestadistico?idPermiso=35&dimFuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA', // the url which stores the stuff in db for each step
-					 contentType: "application/json; charset=utf-8",
-					 dataType : 'json',
-					 beforeSubmit:  function(wizardData){
-				   		if(totalPorc < 100){
-				 			$("#status_"+currentStep).text('El total debe ser 100')
-				 			                         .css("color","red")
-				 			                         .fadeTo("fast",100)
-				 			                         .delay(1600)
-				 			                         .fadeTo("5000",0);
-				 			return false;
-				 		}
-				   	 },
-					 success: function(wizardData){ // called when the form has been submitted correctly to the server
-				   	 	return true;//wizardData;
-				   	 },
-					};
-				});*/
-
-				//$("#encuestaForm").formwizard("option", "remoteAjax", remoteAjax);
 
 	    	     // Grids respectivos por cada pregunta
 	    	  	#{list items:encuesta.encuestas, as:'encu'}
@@ -198,7 +180,7 @@
 				//var texto = $('list_1 tr:nth-child(1) td:nth-child(2)').text();
 				//var texto = $('#list_1 tr th:first').text();
 				
-				
+				//Modificar registros
 				$.ajax({
                     	   type: "GET",
                     	   dataType: "json",

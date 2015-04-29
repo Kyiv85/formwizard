@@ -61,16 +61,9 @@
 				   formOptions: {
 				   	success: function(data){ // called when the form has been submitted correctly to the server
 				   	},
-      				beforeSubmit:  function(wizardData){
-				   		if(totalPorc < 100){
-				 			$("#status_"+currentStep).text('El total debe ser 100')
-				 			                         .css("color","red")
-				 			                         .fadeTo("fast",100)
-				 			                         .delay(1600)
-				 			                         .fadeTo("5000",0);
-				 			return false;
-				 		}
-				   	},
+      				beforeSubmit:  function(data){
+
+				 	},
 				   	dataType: 'json',
 				   	resetForm: false
 				   }
