@@ -5,6 +5,11 @@
 			
 			var currentStep = 1;
 			var totalPorc = 0;
+			var totalGen = 0;
+
+			$("#encuestaForm").validate({
+  				debug: true
+			});
 		    // Form de inserción de nuevos elementos
 	    	$("#encuestaForm").formwizard({ //wizard settings
 			 	formPluginEnabled: true, //Ajax is used to post the form to the server
@@ -33,8 +38,9 @@
 				 			console.log("previousStep:"+wizardData.previousStep);
 				 			
 							if(totalGen == totalPorc){
-								//$("#encuestaForm").submit()
-				 				return true;
+								$("#encuestaForm").submit(function() {
+  									return false;
+								});
 				 			}
 				 			else{
 				 			$("#status_"+currentStep).text('Las encuestas no están al 100%')
@@ -94,11 +100,12 @@
 
 				   },*/
 				   formOptions: {
-				   	success: function(data){ // called when the form has been submitted correctly to the server
+				   	success: function(wizardData){ // called when the form has been submitted correctly to the server
+				   		
 				   	},
-      				beforeSubmit:  function(data){
+      				beforeSubmit:  function(wizardData){
 
-				 	},
+      				},
 				   	dataType: 'json',
 				   	resetForm: false
 				   }

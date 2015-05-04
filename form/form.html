@@ -1,0 +1,980 @@
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="" lang="">
+      <head>
+        <title>CANTV </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <link rel="shortcut icon" type="image/png" href="images/favicon.ico">
+        <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/crud.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/main.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="javascripts/jquery.alerts.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/jquery-ui-1.8.1.custom.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/ui.jqgrid.css" />
+		<link type="text/css" rel="stylesheet" href="javascripts/jquery-spinbox/jquery.spinbox.css" />
+
+		<script src="javascripts/jquery-1.4.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="javascripts/jquery.alerts.js" type="text/javascript" charset="utf-8"></script>
+		<script src="javascripts/formwizard/jquery.history.js" type="text/javascript" charset="utf-8"></script>
+        <script src="javascripts/formwizard/jquery.form.js" type="text/javascript" charset="utf-8"></script>
+        <script src="javascripts/formwizard/jquery.validate.js" type="text/javascript" charset="utf-8"></script>
+        <script src="javascripts/formwizard/jquery.form.wizard-2.0.1.js" type="text/javascript" charset="utf-8"></script>
+
+		<script src="javascripts/jqgrid/grid.locale-en.js" type="text/javascript"></script>
+		<script src="javascripts/jqgrid/jquery.jqGrid.min.js" type="text/javascript"></script>
+
+	    <script type="text/javascript" src="javascripts/jquery-spinbox/jquery.spinbox.js"></script>
+	    <script type="text/javascript" src="javascripts/alphanumeric/jquery.alphanumeric.js"></script>
+	    <script type="text/javascript" src="javascripts/json2.js"></script>
+
+    </head>
+	<body id="crud">
+
+		<div id="crudHeader">
+
+			<a href="/SASWeb/" > <img  src="images/logo.gif" alt="CANTV" /> </a>
+			<h2 class="red">Portal SASWeb | Módulo Funcional</h2>
+			<nobr class ="logout">
+			<span><a id=":r4" href="/SASWeb/" >Inicio</a></span>  |<span><a id=":r4" href="/SASWeb/public/ayuda/ModuloFuncional.htm" target="_blank">Ayuda</a></span> | <a target="_top" href="/SASWeb/logout" id=":r7" >Salir</a>
+			</nobr>
+		</div>
+
+		<div class="list-menu">
+			<ul id="list-nav">
+			<li><a href="/SASWeb/funcional">Principal</a></li>
+			<li><a href="/SASWeb/ordenes">Ordenes</a></li>
+			<li><a href="/SASWeb/estadisticos">Estadisticos</a></li>
+			<li class="last"><a href="/SASWeb/encuestas">Revisar Encuestas</a></li>
+			</ul>
+		</div>
+
+		<div style="float: right; margin-right: 15px;">
+ 		<b>Usuario: Funcional(Administrador,Encuestado,Funcional,Generador,Seguridad)</b>
+		</div>
+
+				
+		<div id="crudContent">
+			<script type="text/javascript">
+		$(function(){
+			
+			var currentStep = 1;
+			var totalPorc = 0;
+			var totalGen = 0;
+
+			$("#encuestaForm").validate({
+  				debug: true
+			});
+		    // Form de inserción de nuevos elementos
+	    	$("#encuestaForm").formwizard({ //wizard settings
+			 	formPluginEnabled: true, //Ajax is used to post the form to the server
+			 	validationEnabled : true, //The Validation plugin is used for validating the form at each step
+			 	focusFirstInput : true, // puts focus at the first input on each step
+			 	textSubmit: "Ver Resumen",
+			 	beforeNext: function(wizardData){
+			 		//Valor total del grid
+			 		var values = jQuery("#list_"+currentStep).jqGrid('footerData');
+			 			console.log("currentStep:"+currentStep);
+				 		console.log("Porcentaje:"+totalPorc);
+				 		console.log("totalGen:"+totalGen);
+				 		console.log("activatedSteps:"+wizardData.activatedSteps);
+				 		console.log("isLastStep:"+wizardData.isLastStep);
+				 		console.log("previousStep:"+wizardData.previousStep);
+				 		//if(parseInt(values['cell.DQF']) == 0 || parseInt(values['cell.DQF']) == 100){
+				 		if(wizardData.isLastStep){
+				 			totalGen = currentStep*100;
+				 			totalPorc = totalPorc+parseInt(values['cell.DQF']);
+
+				 			console.log("currentStep:"+currentStep);
+				 			console.log("Porcentaje:"+totalPorc);
+				 			console.log("totalGen:"+totalGen);
+				 			console.log("activatedSteps:"+wizardData.activatedSteps);
+				 			console.log("isLastStep:"+wizardData.isLastStep);
+				 			console.log("previousStep:"+wizardData.previousStep);
+				 			
+							if(totalGen == totalPorc){
+								$("#encuestaForm").submit(function() {
+  									return false;
+								});
+				 			}
+				 			else{
+				 			$("#status_"+currentStep).text('Las encuestas no están al 100%')
+				 			                         .css("color","red")
+				 			                         .fadeTo("fast",100)
+				 			                         .delay(1600)
+				 			                         .fadeTo("5000",0);
+				 			return false;
+				 			}
+				 		}
+				 		else{
+				 			if(parseInt(values['cell.DQF']) <= 100){
+				 				if(wizardData.backwards != true)
+				 					currentStep++;
+				 				console.log("currentStep:"+currentStep);
+				 				totalPorc = parseInt(values['cell.DQF']);
+				 				console.log("Porcentaje:"+totalPorc);
+				 				console.log("activatedSteps:"+wizardData.activatedSteps);
+				 				console.log("isLastStep:"+wizardData.isLastStep);
+				 				return true;
+				 			}
+				 			else{
+				 				//$("#status_"+currentStep).text('El total no es 0 ni suma 100')
+				 				$("#status_"+currentStep).text('El total no debe ser mayor a 100')
+				 			    	                     .css("color","red")
+				 			        	                 .fadeTo("fast",100)
+				 			            	             .delay(1600)
+				 			                	         .fadeTo("5000",0);
+				 				return false;
+				 			}
+				 		}
+				 	},
+				 	afterNext : function(wizardData){
+						next = $("li.current").next();
+						current = $("li.current");
+						prev = current.prev();
+						current.removeClass('current').addClass('lastDone');
+                        next.addClass('current');
+                        if(prev.length != 0){
+    						prev.removeClass('lastDone').addClass('done');
+                        }
+                        return false;
+				 	},
+				 	afterBack : function(wizardData){
+						prev = $("li.current").prev();
+						$("li.current").removeClass('current')
+						prev.removeClass().addClass('current');
+						prev.prev().removeClass().addClass('lastDone');
+						currentStep--;
+				 	},
+				 /*},
+				 {
+					messages: {}
+				 },
+				 {
+				   remoteAjax: {
+
+				   },*/
+				   formOptions: {
+				   	success: function(wizardData){ // called when the form has been submitted correctly to the server
+				   		
+				   	},
+      				beforeSubmit:  function(wizardData){
+
+      				},
+				   	dataType: 'json',
+				   	resetForm: false
+				   }
+				});
+
+
+	    	     // Grids respectivos por cada pregunta
+	    	  					jQuery("[id='list_1']").jqGrid({
+					url:'/SASWeb/func/encList/35/62?fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24',
+					datatype: "json",
+					colModel:[
+                        {name:'id', label:'aaaa', hidden:true},
+				   	    				   		 {name:'cell.DestinoDimMemberRef1', label:'Servicios de Red', align:"left", sortable:false},
+				   						   		{name:'cell.DQF', label:'pza', align:"right", formatter:"number",editable:true}
+				   	],
+				   	footerrow : true,
+					userDataOnFooter : true,
+				   	jsonReader : {
+				          repeatitems:false
+				    },
+				   	sortname: 'id',
+				   	reloadAfterSubmit: true,
+					multiselect: true,
+				   	multiselectWidth:219,
+				   	reloadAfterSubmit: false,
+				    viewrecords: true,
+				    width:955,
+				    editurl:"/SASWeb/application/deleteencuestarowdataests?idPermiso=35",
+				    caption:"Dedicaci&oacute;n",
+				    ajaxGridOptions : {error: function(xhr, msg, error){
+				    	$('#status_1').text('Los datos de la tabla no pudieron ser cargados')
+				    	                         .css("color","red")
+				    	                         .fadeTo("fast",100)
+				    	                         .delay(100600)
+				    	                         .fadeTo("5000",0);
+						}
+					}
+				});
+				jQuery("#ed1").click( function() {
+				
+	            jQuery("[id='list_1']").jqGrid('editRow',id=jQuery("[id='list_1']").jqGrid("getGridParam", "selarrrow"));
+	            this.disabled = 'true';
+	            jQuery("#sved1,#cned1").attr("disabled",false);
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+				//Funcion para modificar DQF
+				jQuery("#sved1").click( function() {
+	            var parent = $(this).closest("span");
+                var formData = $(".actividad", parent).serializeArray();
+                var gr = jQuery("[id='list_1']").jqGrid("getGridParam", "selarrrow")
+                var ret = jQuery("[id='list_1']").jqGrid('getRowData',gr);
+                
+                
+            	//var tos = $('tr[id='+gr+'] td[aria-describedby=list_1_cell.DQF]').attr('title');
+				var dqfn = $('tr[id='+gr+'] td[aria-describedby=list_1_cell.DQF] input[id='+gr+'_cell.DQF]').val();
+				
+				//var texto = $('list_1 tr:nth-child(1) td:nth-child(2)').text();
+				//var texto = $('#list_1 tr th:first').text();
+				
+				//Modificar registros
+				$.ajax({
+                    	   type: "GET",
+                    	   dataType: "json",
+                    	   data: ({ 'choices': JSON.stringify(gr)}),
+                    	   url: "/SASWeb/application/actualizaencuestarowdataest?idPermiso=35&fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24&dqf="+dqfn+"",
+                    	   success: function(data){
+      					     if(data.success == 'true' ){
+    					    	 jQuery("[id='list_1']").trigger("reloadGrid");
+    	      					 $('#status_1').text('El registro fue Modificado')
+		                                                   .css("color","green")
+		                                                   .fadeTo("fast",100)
+		                                                   .delay(1600)
+		                                                   .fadeTo("5000",0);
+		                         jQuery("#sved1,#cned1").attr("disabled",true);
+		                         jQuery("#ed1").attr("disabled",false);
+		                      }else if(data.success == 'false'){
+		                    	  $('#status_1').text(data.message)
+	     							                          .css("color","red")
+	     							                          .fadeTo("fast",100)
+	     							                          .delay(1600)
+	     							                          .fadeTo("5000",0);
+		                      }
+     						},
+    						error: function(xhr, msg, error){
+     							$('#status_1').text('El registro no pudo ser Modificado')
+     							                          .css("color","red")
+     							                          .fadeTo("fast",100)
+     							                          .delay(1600)
+     							                          .fadeTo("5000",0);
+       						}
+                    	 });
+				//this.disabled = 'true';
+	            //jQuery("#sved1,#cned1").attr("disabled",false);
+                
+				});
+				
+				//Cancelar Edicion DQF
+                jQuery("#cned1").click( function() {
+	            jQuery("[id='list_1']").jqGrid('restoreRow',jQuery("[id='list_1']").jqGrid("getGridParam", "selarrrow"));
+	            jQuery("#sved1,#cned1").attr("disabled",true);
+	            jQuery("#ed1").attr("disabled",false);
+                    });
+                //Borrar fila
+				$("#dedata_1").click(function(){
+					var gr = jQuery("[id='list_1']").jqGrid('getGridParam','selarrrow');
+					
+					if( gr != null )
+						jQuery("[id='list_1']").jqGrid('delGridRow',gr,{reloadAfterSubmit:true,
+							bSubmit: "Borrar",
+							bCancel: "Cancelar",
+							msg: "Desea borrar la(s) siguiente(s) fila(s)?",
+							caption: "Borrar fila",
+							url: "/SASWeb/application/deleteencuestarowdataests?idPermiso=35&fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24" 
+              		    });
+					else
+						$('#status_1').text('Seleccione la fila a borrar')
+						                         .css("color","red")
+						                         .fadeTo("fast",100)
+						                         .delay(1600)
+						                         .fadeTo("5000",0);
+				});
+								jQuery("[id='list_2']").jqGrid({
+					url:'/SASWeb/func/encList/35/69?fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24',
+					datatype: "json",
+					colModel:[
+                        {name:'id', label:'aaaa', hidden:true},
+				   	    				   		 {name:'cell.DestinoDimMemberRef1', label:'Servicios de Red', align:"left", sortable:false},
+				   						   		{name:'cell.DQF', label:'porc', align:"right", formatter:"number",editable:true}
+				   	],
+				   	footerrow : true,
+					userDataOnFooter : true,
+				   	jsonReader : {
+				          repeatitems:false
+				    },
+				   	sortname: 'id',
+				   	reloadAfterSubmit: true,
+					multiselect: true,
+				   	multiselectWidth:219,
+				   	reloadAfterSubmit: false,
+				    viewrecords: true,
+				    width:955,
+				    editurl:"/SASWeb/application/deleteencuestarowdataests?idPermiso=35",
+				    caption:"Dedicaci&oacute;n",
+				    ajaxGridOptions : {error: function(xhr, msg, error){
+				    	$('#status_2').text('Los datos de la tabla no pudieron ser cargados')
+				    	                         .css("color","red")
+				    	                         .fadeTo("fast",100)
+				    	                         .delay(100600)
+				    	                         .fadeTo("5000",0);
+						}
+					}
+				});
+				jQuery("#ed1").click( function() {
+				
+	            jQuery("[id='list_2']").jqGrid('editRow',id=jQuery("[id='list_2']").jqGrid("getGridParam", "selarrrow"));
+	            this.disabled = 'true';
+	            jQuery("#sved1,#cned1").attr("disabled",false);
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+				//Funcion para modificar DQF
+				jQuery("#sved1").click( function() {
+	            var parent = $(this).closest("span");
+                var formData = $(".actividad", parent).serializeArray();
+                var gr = jQuery("[id='list_2']").jqGrid("getGridParam", "selarrrow")
+                var ret = jQuery("[id='list_2']").jqGrid('getRowData',gr);
+                
+                
+            	//var tos = $('tr[id='+gr+'] td[aria-describedby=list_1_cell.DQF]').attr('title');
+				var dqfn = $('tr[id='+gr+'] td[aria-describedby=list_1_cell.DQF] input[id='+gr+'_cell.DQF]').val();
+				
+				//var texto = $('list_1 tr:nth-child(1) td:nth-child(2)').text();
+				//var texto = $('#list_1 tr th:first').text();
+				
+				//Modificar registros
+				$.ajax({
+                    	   type: "GET",
+                    	   dataType: "json",
+                    	   data: ({ 'choices': JSON.stringify(gr)}),
+                    	   url: "/SASWeb/application/actualizaencuestarowdataest?idPermiso=35&fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24&dqf="+dqfn+"",
+                    	   success: function(data){
+      					     if(data.success == 'true' ){
+    					    	 jQuery("[id='list_2']").trigger("reloadGrid");
+    	      					 $('#status_2').text('El registro fue Modificado')
+		                                                   .css("color","green")
+		                                                   .fadeTo("fast",100)
+		                                                   .delay(1600)
+		                                                   .fadeTo("5000",0);
+		                         jQuery("#sved1,#cned1").attr("disabled",true);
+		                         jQuery("#ed1").attr("disabled",false);
+		                      }else if(data.success == 'false'){
+		                    	  $('#status_2').text(data.message)
+	     							                          .css("color","red")
+	     							                          .fadeTo("fast",100)
+	     							                          .delay(1600)
+	     							                          .fadeTo("5000",0);
+		                      }
+     						},
+    						error: function(xhr, msg, error){
+     							$('#status_2').text('El registro no pudo ser Modificado')
+     							                          .css("color","red")
+     							                          .fadeTo("fast",100)
+     							                          .delay(1600)
+     							                          .fadeTo("5000",0);
+       						}
+                    	 });
+				//this.disabled = 'true';
+	            //jQuery("#sved1,#cned1").attr("disabled",false);
+                
+				});
+				
+				//Cancelar Edicion DQF
+                jQuery("#cned1").click( function() {
+	            jQuery("[id='list_2']").jqGrid('restoreRow',jQuery("[id='list_2']").jqGrid("getGridParam", "selarrrow"));
+	            jQuery("#sved1,#cned1").attr("disabled",true);
+	            jQuery("#ed1").attr("disabled",false);
+                    });
+                //Borrar fila
+				$("#dedata_2").click(function(){
+					var gr = jQuery("[id='list_2']").jqGrid('getGridParam','selarrrow');
+					
+					if( gr != null )
+						jQuery("[id='list_2']").jqGrid('delGridRow',gr,{reloadAfterSubmit:true,
+							bSubmit: "Borrar",
+							bCancel: "Cancelar",
+							msg: "Desea borrar la(s) siguiente(s) fila(s)?",
+							caption: "Borrar fila",
+							url: "/SASWeb/application/deleteencuestarowdataests?idPermiso=35&fuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA&conductor=%25+CAP_10+a+CAP_24" 
+              		    });
+					else
+						$('#status_2').text('Seleccione la fila a borrar')
+						                         .css("color","red")
+						                         .fadeTo("fast",100)
+						                         .delay(1600)
+						                         .fadeTo("5000",0);
+				});
+								
+				//Insertar registro
+			  				$(".addItem_1").click(function() {
+					// get the parent form
+					var parent = $(this).closest("span");
+                    var formData = $(".actividad", parent).serializeArray();
+                    $.ajax({
+                    	   type: "GET",
+                    	   url: "/SASWeb/application/insertencuestarowdataestadistico?&idPermiso=35&idPregunta=62&dimFuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA",
+                    	   dataType: "json",
+                    	   data: ({ 'choices': JSON.stringify(formData)}),
+                    	   success: function(data){
+      					     if(data.success == 'true' ){
+    					    	 jQuery("[id='list_1']").trigger("reloadGrid");
+    	      					 $('#status_1').text('El registro fue insertado')
+		                                                   .css("color","green")
+		                                                   .fadeTo("fast",100)
+		                                                   .delay(1600)
+		                                                   .fadeTo("5000",0);
+		                      }else if(data.success == 'false'){
+		                    	  $('#status_1').text(data.message)
+		                    	                              .css("color","red")
+		                    	                              .fadeTo("fast",100)
+		                    	                              .delay(1600)
+		                    	                              .fadeTo("5000",0);
+                           	  }
+		                    },
+    						error: function(xhr, msg, error){
+     							$('#status_1').text('El registro no pudo ser insertado')
+     							                          .css("color","red")
+     							                          .fadeTo("fast",100)
+     							                          .delay(1600)
+     							                          .fadeTo("5000",0);
+       						}
+                    	 });
+               	 	});
+								$(".addItem_2").click(function() {
+					// get the parent form
+					var parent = $(this).closest("span");
+                    var formData = $(".actividad", parent).serializeArray();
+                    $.ajax({
+                    	   type: "GET",
+                    	   url: "/SASWeb/application/insertencuestarowdataestadistico?&idPermiso=35&idPregunta=69&dimFuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA",
+                    	   dataType: "json",
+                    	   data: ({ 'choices': JSON.stringify(formData)}),
+                    	   success: function(data){
+      					     if(data.success == 'true' ){
+    					    	 jQuery("[id='list_2']").trigger("reloadGrid");
+    	      					 $('#status_2').text('El registro fue insertado')
+		                                                   .css("color","green")
+		                                                   .fadeTo("fast",100)
+		                                                   .delay(1600)
+		                                                   .fadeTo("5000",0);
+		                      }else if(data.success == 'false'){
+		                    	  $('#status_2').text(data.message)
+		                    	                              .css("color","red")
+		                    	                              .fadeTo("fast",100)
+		                    	                              .delay(1600)
+		                    	                              .fadeTo("5000",0);
+                           	  }
+		                    },
+    						error: function(xhr, msg, error){
+     							$('#status_2').text('El registro no pudo ser insertado')
+     							                          .css("color","red")
+     							                          .fadeTo("fast",100)
+     							                          .delay(1600)
+     							                          .fadeTo("5000",0);
+       						}
+                    	 });
+               	 	});
+								$(".Porcentaje").spinbox({
+					  min: 0,	   // Set lower limit or null for no limit.
+					  max: 100,  // Set upper limit or null for no limit.
+					  step: 1	 // Set increment size.
+				});
+				$('.Bolivares').numeric({allow:"."});
+				$('.Entero').numeric({allow:"."});
+			});
+</script>
+<div id="crudShow" class="">
+
+
+	<h5 id="crudShowTitle">Periodo: A-2010</h5>
+
+
+
+	<div class="objectForm">
+
+		<form action="/SASWeb/application/showencuestasummaryestadistico?idPermiso=35&dimFuente=RR_RE_CEN_APURE-PR_FI_PROSER_INSTAC_ABA" method="POST" accept-charset="utf-8" enctype="multipart/form-data" id="encuestaForm" ><input type="hidden" name="authenticityToken" value="fca53c59ddd4d35f64ebd2c944b580d63396521d">
+
+		    	 <span class="step" id="step_1">
+
+             	       <label class="activity" for="object_1">
+			   Servicios de Red:
+		   </label>
+
+				<select class='actividad' id="SR" name="SR" style="width: 300px">
+										<option value="SR_CONS_ASECAS_O&amp;M_ABA">ABA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_ABA1">ABA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_ABA">ABA</option>
+										<option value="SR_CONS_PROPLA_ABA">ABA</option>
+										<option value="SR_CONS_PROPLA_ABA1">ABA</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_ABA">ABA</option>
+										<option value="SR_CONS_PROSER_INSTAC_ABA">ABA</option>
+										<option value="SR_CONS_PROSER_RETIRO_ABA">ABA</option>
+										<option value="SR_ND_OBS_CAP_AD">ADSL</option>
+										<option value="SR_ND_OBS_CEN_AD">ADSL</option>
+										<option value="SR_ND_OBS_INS_AD">ADSL</option>
+										<option value="SR_ND_OBS_OCC_AD">ADSL</option>
+										<option value="SR_ND_OBS_ORI_AD">ADSL</option>
+										<option value="SR_ND_900100">Alquiler de Postes</option>
+										<option value="SR_ND_9001001">Alquiler de Postes</option>
+										<option value="SR_CONS_ASECAS">Aseguramiento de la Calidad del Servicio</option>
+										<option value="SR_ASC">Asignados al Modelo Comun</option>
+										<option value="SR_MO_TRANS_ATMF">ATM Frame Relay</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_AUDIO">Audio</option>
+										<option value="SR_CONS_PROPLA_OTSERV_AUDIO">Audio</option>
+										<option value="SR_CONS_PROSER_INSTAC_BLODES">Bloqueos/Desbloqueos</option>
+										<option value="SR_MO_PLAT_XPERT">BSS X-PERT</option>
+										<option value="SR_MO_GR_BSS">Business System Support (Plataformas)</option>
+										<option value="SR_ND_OBS_CAP">Capital</option>
+										<option value="SR_ND_OBS_CEN">Central</option>
+										<option value="SR_ND_OBS_ORI_CX">Conmutacion</option>
+										<option value="SR_ND_OBS_CAP_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_CEN_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_INS_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_OCC_CX">Conmutaci&oacute;n</option>
+										<option value="SR_MO_CCM_CC">Conmutaci&oacute;n Central</option>
+										<option value="SR_MO_CCM">Conmutacion Centrales Moviles</option>
+										<option value="SR_CONS">Consolidado</option>
+										<option value="SR_MO_TRANS_CLD">Costo de Larga Distancia</option>
+										<option value="SR_CND">Costos No Distribu&iacute;dos</option>
+										<option value="SR_CND_CND">Costos No Distribu&iacute;dos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_CPA">CPA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_CPA1">CPA</option>
+										<option value="SR_CONS_PROPLA_CPA">CPA</option>
+										<option value="SR_CONS_PROPLA_CPA1">CPA</option>
+										<option value="SR_CONS_PROSER_INSTAC_CPA">CPA</option>
+										<option value="SR_CONS_PROSER_RETIRO_CPA">CPA</option>
+										<option value="SR_ND_901521_CTC">CTC</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_DATOS">Datos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_DATOS1">Datos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_DATOS">DATOS</option>
+										<option value="SR_CONS_PROPLA_DATOS">Datos</option>
+										<option value="SR_CONS_PROPLA_DATOS1">Datos</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_DATOS">DATOS</option>
+										<option value="SR_CONS_PROSER_FACTEC_DATOS">Datos</option>
+										<option value="SR_CONS_PROSER_INSTAC_DATOS">Datos</option>
+										<option value="SR_CONS_PROSER_RETIRO_DATOS">Datos</option>
+										<option value="SR_ND_OBS_CAP_DT">Datos</option>
+										<option value="SR_ND_OBS_CEN_DT">Datos</option>
+										<option value="SR_ND_OBS_INS_DT">Datos</option>
+										<option value="SR_ND_OBS_OCC_DT">Datos</option>
+										<option value="SR_ND_OBS_ORI_DT">Datos</option>
+										<option value="SR_CONS_PROSER_FACTEC">Factibilidad T&eacute;cnica</option>
+										<option value="SR_ND_500000000440_Fact_AV_TELCO">Facturacion Avanzada Telecom</option>
+										<option value="SR_ASC_RD">Gastos Asignados del Modelo Serv de Red</option>
+										<option value="SR_ND_PROY">Gerencia Proyecto</option>
+										<option value="SR_MO_GR">Gestion de la Red</option>
+										<option value="SR_MO_CCM_HLR">HLR</option>
+										<option value="SR_CONS_PROSER_INSTAC">Instalaci&oacute;n de Clientes</option>
+										<option value="SR_ND_OBS_INS">Insular</option>
+										<option value="SR_MO_CCM_IXOR">Interconexion a Otras Redes</option>
+										<option value="SR_ND_IXREDEST">Interconexi&oacute;n de Redes del Estado</option>
+										<option value="SR_ND_IXREDEST1">Interconexi&oacute;n de Redes del Estado</option>
+										<option value="SR_MO_CCM_IXR">Interconexion Interna (Roaming entre Centrales)</option>
+										<option value="ND">No Distribuido</option>
+										<option value="SR_ND_OBS">Obsolescencia</option>
+										<option value="SR_ND_OBS_OCC">Occidental</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OCALL">Open Call</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OCALL1">Open Call</option>
+										<option value="SR_CONS_PROPLA_OCALL">Open Call</option>
+										<option value="SR_CONS_PROPLA_OCALL1">Open Call</option>
+										<option value="SR_CONS_ASECAS_O&amp;M">Operaci&oacute;n &amp; Mantenimiento</option>
+										<option value="SR_MO_PLAT_OSS">Operation Support Systems (Plataformas)</option>
+										<option value="SR_ND_FSU_RYN_GGTO">Ordenes FSU R&amp;N</option>
+										<option value="SR_ND_FSU_RYN_GGTO1">Ordenes FSU R&amp;N</option>
+										<option value="SR_ND_OPER_PROY2">Ordenes Proyectos Mayores</option>
+										<option value="SR_ND_OBS_ORI">Oriental</option>
+										<option value="SR_ND_500000000960_OSS">OSS Fase I</option>
+										<option value="SR_MO_PLAT_IVRPO">OSS-IVR Postpago</option>
+										<option value="SR_MO_PLAT_IVRPR">OSS-IVR Prepago</option>
+										<option value="SR_MO_PLAT_SMS">OSS-Movil Text (SMS)</option>
+										<option value="SR_MO_PLAT_PRE">OSS-Prepago</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV">Otros Servicios</option>
+										<option value="SR_CONS_PROPLA_OTSERV">Otros Servicios</option>
+										<option value="SR_MO_OTROS">Otros Servicios</option>
+										<option value="SR_MO_OTROS_OTR">Otros Servicios</option>
+										<option value="SR_ND_900080">Outsourcing de Sistemas</option>
+										<option value="SR_ND_9000801">Outsourcing de Sistemas</option>
+										<option value="SR_ND_OBS_CAP_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_CEN_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_INS_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_OCC_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_ORI_PE">Planta Externa</option>
+										<option value="SR_MO_PLAT">Plataformas</option>
+										<option value="SR_ND_500000001596_Portal_PAC">Portal  Autoservicios Corporativo (PAC)</option>
+										<option value="SR_CONS_PROPLA">Provisi&oacute;n de la Planta</option>
+										<option value="SR_CONS_PROSER">Provisi&oacute;n de Servicio</option>
+										<option value="SR_ND_PROY_BSF_GGTO">Proyecto Bolivar Fuerte</option>
+										<option value="SR_ND_PROY_BSF_GGTO1">Proyecto Bolivar Fuerte</option>
+										<option value="SR_ND_900840_Proyecto_CFM - OPEX">Proyecto CFM - OPEX</option>
+										<option value="SR_ND_500000000000_Proyecto_CFM">Proyecto CFM 500000000000</option>
+										<option value="SR_ND_500000002182_Proyecto_CFM">Proyecto CFM 500000002182</option>
+										<option value="SR_ND_500000000490_CFM-CTC">Proyecto CFM-CTC</option>
+										<option value="SR_ND_500000000704_CRM_Sap_Corp">Proyecto CRM Sap Corporativo</option>
+										<option value="SR_ND_PE_CNE_GGTO">Proyecto Especial CNE</option>
+										<option value="SR_ND_PE_CNE_GGTO1">Proyecto Especial CNE</option>
+										<option value="SR_ND_ND_INTERNET_TV_00">Proyecto Internet TV</option>
+										<option value="SR_ND_ND_INTERNET_TV_001">Proyecto Internet TV</option>
+										<option value="SR_ND_ND_IPTV_00">Proyecto IPTV</option>
+										<option value="SR_ND_ND_IPTV_001">Proyecto IPTV</option>
+										<option value="SR_MO_RBRA">Radio Bases y Red de Acceso</option>
+										<option value="SR_MO_RBRA_RA">Radio Bases y Red de Acceso</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_RI">Red Inteligente</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_RI1">Red Inteligente</option>
+										<option value="SR_CONS_PROPLA_RI">Red Inteligente</option>
+										<option value="SR_CONS_PROPLA_RI1">Red Inteligente</option>
+										<option value="SR_CONS_PROSER_INSTAC_RI">Red Inteligente</option>
+										<option value="SR_CONS_PROSER_RETIRO">Retiros</option>
+										<option value="SR_ND_SAT_SB">Satelite Simon Bolivar</option>
+										<option value="SR_ND_SAT_SB1">Satelite Simon Bolivar</option>
+										<option value="SR_FI">Servicios de Red Fija</option>
+										<option value="SR_MO">Servicios de Red M&oacute;vil</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVIN">Servicios Internacionales</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVTEMP">Servicios Temporales</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVER">Servicios Verticales</option>
+										<option value="SR_MO_SPCO">Spectro Conatel</option>
+										<option value="SR_MO_SPCO_SC">Spectro Conatel</option>
+										<option value="SR_MO_CCM_STP">STP</option>
+										<option value="SR_ND_OBS_ORI_TB">Telefonia Basica</option>
+										<option value="SR_ND_OBS_CAP_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_CEN_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_INS_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_OCC_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_ORI_TP">Telefonia Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TP1">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TP1">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROSER_FACTEC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROSER_INSTAC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_CAP_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_CEN_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_INS_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_OCC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_MO_TRANS">Transmision</option>
+										<option value="SR_ND_OBS_ORI_TX">Transmision</option>
+										<option value="SR_ND_OBS_CAP_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_CEN_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_INS_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_OCC_TX">Transmisi&oacute;n</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE">Transporte</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE">Transporte</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_TV">TV</option>
+										<option value="SR_CONS_PROPLA_OTSERV_TV">TV</option>
+										<option value="SR_CONS_PROPLA_OTSERV_TV1">TV</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_VIDEO">Video</option>
+										<option value="SR_CONS_PROPLA_OTSERV_VIDEO">Video</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_VIDCONF">Video Conferencia</option>
+										<option value="SR_CONS_PROPLA_OTSERV_VIDCONF">Video Conferencia</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_VOZ">Voz</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ">Voz</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_VOZ">Voz</option>
+										<option value="SR_CONS_PROPLA_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_FACTEC_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_INSTAC_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_RETIRO_VOZ">Voz</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_ACC">Voz (Acceso)</option>
+										<option value="SR_CONS_PROPLA_VOZ_ACC">Voz (Acceso)</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_CX">Voz (Cx)</option>
+										<option value="SR_CONS_PROPLA_VOZ_CX">Voz (Cx)</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_PQ">Voz (Pq)</option>
+										<option value="SR_CONS_PROPLA_VOZ_PQ">Voz (Pq)</option>
+									</select>
+
+			 <br>
+			 			 <label class="activity" for="object_Porcentaje">pza</label>
+			 <input id="Porcentaje" class="Porcentaje actividad" type="text" name="Porcentaje" value="" size="20">
+
+			<br>
+
+
+			<p id="crudItemAdd">
+				<a class="addItem_1" href="#">Agregar</a>
+			</p>
+			 <label id="status_1" class="status" ></label>
+			<br>
+			<table id="list_1"></table>
+
+		    <p id="dedata_1"  class="crudItemDelete">
+				<a class="dedata_1" href="#">Borrar</a>
+			</p>
+
+		    <input type="BUTTON"  id="ed1" value="Editar"/>
+             <input type="BUTTON" id="sved1" disabled='true' value="Guardar" />
+             <input type="BUTTON" id="cned1" disabled='true' value="Cancelar" />
+			
+			
+
+
+		</span>
+		    	 <span class="step" id="step_2">
+
+             	       <label class="activity" for="object_1">
+			   Servicios de Red:
+		   </label>
+
+				<select class='actividad' id="SR" name="SR" style="width: 300px">
+										<option value="SR_CONS_ASECAS_O&amp;M_ABA">ABA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_ABA1">ABA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_ABA">ABA</option>
+										<option value="SR_CONS_PROPLA_ABA">ABA</option>
+										<option value="SR_CONS_PROPLA_ABA1">ABA</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_ABA">ABA</option>
+										<option value="SR_CONS_PROSER_INSTAC_ABA">ABA</option>
+										<option value="SR_CONS_PROSER_RETIRO_ABA">ABA</option>
+										<option value="SR_ND_OBS_CAP_AD">ADSL</option>
+										<option value="SR_ND_OBS_CEN_AD">ADSL</option>
+										<option value="SR_ND_OBS_INS_AD">ADSL</option>
+										<option value="SR_ND_OBS_OCC_AD">ADSL</option>
+										<option value="SR_ND_OBS_ORI_AD">ADSL</option>
+										<option value="SR_ND_900100">Alquiler de Postes</option>
+										<option value="SR_ND_9001001">Alquiler de Postes</option>
+										<option value="SR_CONS_ASECAS">Aseguramiento de la Calidad del Servicio</option>
+										<option value="SR_ASC">Asignados al Modelo Comun</option>
+										<option value="SR_MO_TRANS_ATMF">ATM Frame Relay</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_AUDIO">Audio</option>
+										<option value="SR_CONS_PROPLA_OTSERV_AUDIO">Audio</option>
+										<option value="SR_CONS_PROSER_INSTAC_BLODES">Bloqueos/Desbloqueos</option>
+										<option value="SR_MO_PLAT_XPERT">BSS X-PERT</option>
+										<option value="SR_MO_GR_BSS">Business System Support (Plataformas)</option>
+										<option value="SR_ND_OBS_CAP">Capital</option>
+										<option value="SR_ND_OBS_CEN">Central</option>
+										<option value="SR_ND_OBS_ORI_CX">Conmutacion</option>
+										<option value="SR_ND_OBS_CAP_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_CEN_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_INS_CX">Conmutaci&oacute;n</option>
+										<option value="SR_ND_OBS_OCC_CX">Conmutaci&oacute;n</option>
+										<option value="SR_MO_CCM_CC">Conmutaci&oacute;n Central</option>
+										<option value="SR_MO_CCM">Conmutacion Centrales Moviles</option>
+										<option value="SR_CONS">Consolidado</option>
+										<option value="SR_MO_TRANS_CLD">Costo de Larga Distancia</option>
+										<option value="SR_CND">Costos No Distribu&iacute;dos</option>
+										<option value="SR_CND_CND">Costos No Distribu&iacute;dos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_CPA">CPA</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_CPA1">CPA</option>
+										<option value="SR_CONS_PROPLA_CPA">CPA</option>
+										<option value="SR_CONS_PROPLA_CPA1">CPA</option>
+										<option value="SR_CONS_PROSER_INSTAC_CPA">CPA</option>
+										<option value="SR_CONS_PROSER_RETIRO_CPA">CPA</option>
+										<option value="SR_ND_901521_CTC">CTC</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_DATOS">Datos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_DATOS1">Datos</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_DATOS">DATOS</option>
+										<option value="SR_CONS_PROPLA_DATOS">Datos</option>
+										<option value="SR_CONS_PROPLA_DATOS1">Datos</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_DATOS">DATOS</option>
+										<option value="SR_CONS_PROSER_FACTEC_DATOS">Datos</option>
+										<option value="SR_CONS_PROSER_INSTAC_DATOS">Datos</option>
+										<option value="SR_CONS_PROSER_RETIRO_DATOS">Datos</option>
+										<option value="SR_ND_OBS_CAP_DT">Datos</option>
+										<option value="SR_ND_OBS_CEN_DT">Datos</option>
+										<option value="SR_ND_OBS_INS_DT">Datos</option>
+										<option value="SR_ND_OBS_OCC_DT">Datos</option>
+										<option value="SR_ND_OBS_ORI_DT">Datos</option>
+										<option value="SR_CONS_PROSER_FACTEC">Factibilidad T&eacute;cnica</option>
+										<option value="SR_ND_500000000440_Fact_AV_TELCO">Facturacion Avanzada Telecom</option>
+										<option value="SR_ASC_RD">Gastos Asignados del Modelo Serv de Red</option>
+										<option value="SR_ND_PROY">Gerencia Proyecto</option>
+										<option value="SR_MO_GR">Gestion de la Red</option>
+										<option value="SR_MO_CCM_HLR">HLR</option>
+										<option value="SR_CONS_PROSER_INSTAC">Instalaci&oacute;n de Clientes</option>
+										<option value="SR_ND_OBS_INS">Insular</option>
+										<option value="SR_MO_CCM_IXOR">Interconexion a Otras Redes</option>
+										<option value="SR_ND_IXREDEST">Interconexi&oacute;n de Redes del Estado</option>
+										<option value="SR_ND_IXREDEST1">Interconexi&oacute;n de Redes del Estado</option>
+										<option value="SR_MO_CCM_IXR">Interconexion Interna (Roaming entre Centrales)</option>
+										<option value="ND">No Distribuido</option>
+										<option value="SR_ND_OBS">Obsolescencia</option>
+										<option value="SR_ND_OBS_OCC">Occidental</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OCALL">Open Call</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OCALL1">Open Call</option>
+										<option value="SR_CONS_PROPLA_OCALL">Open Call</option>
+										<option value="SR_CONS_PROPLA_OCALL1">Open Call</option>
+										<option value="SR_CONS_ASECAS_O&amp;M">Operaci&oacute;n &amp; Mantenimiento</option>
+										<option value="SR_MO_PLAT_OSS">Operation Support Systems (Plataformas)</option>
+										<option value="SR_ND_FSU_RYN_GGTO">Ordenes FSU R&amp;N</option>
+										<option value="SR_ND_FSU_RYN_GGTO1">Ordenes FSU R&amp;N</option>
+										<option value="SR_ND_OPER_PROY2">Ordenes Proyectos Mayores</option>
+										<option value="SR_ND_OBS_ORI">Oriental</option>
+										<option value="SR_ND_500000000960_OSS">OSS Fase I</option>
+										<option value="SR_MO_PLAT_IVRPO">OSS-IVR Postpago</option>
+										<option value="SR_MO_PLAT_IVRPR">OSS-IVR Prepago</option>
+										<option value="SR_MO_PLAT_SMS">OSS-Movil Text (SMS)</option>
+										<option value="SR_MO_PLAT_PRE">OSS-Prepago</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV">Otros Servicios</option>
+										<option value="SR_CONS_PROPLA_OTSERV">Otros Servicios</option>
+										<option value="SR_MO_OTROS">Otros Servicios</option>
+										<option value="SR_MO_OTROS_OTR">Otros Servicios</option>
+										<option value="SR_ND_900080">Outsourcing de Sistemas</option>
+										<option value="SR_ND_9000801">Outsourcing de Sistemas</option>
+										<option value="SR_ND_OBS_CAP_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_CEN_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_INS_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_OCC_PE">Planta Externa</option>
+										<option value="SR_ND_OBS_ORI_PE">Planta Externa</option>
+										<option value="SR_MO_PLAT">Plataformas</option>
+										<option value="SR_ND_500000001596_Portal_PAC">Portal  Autoservicios Corporativo (PAC)</option>
+										<option value="SR_CONS_PROPLA">Provisi&oacute;n de la Planta</option>
+										<option value="SR_CONS_PROSER">Provisi&oacute;n de Servicio</option>
+										<option value="SR_ND_PROY_BSF_GGTO">Proyecto Bolivar Fuerte</option>
+										<option value="SR_ND_PROY_BSF_GGTO1">Proyecto Bolivar Fuerte</option>
+										<option value="SR_ND_900840_Proyecto_CFM - OPEX">Proyecto CFM - OPEX</option>
+										<option value="SR_ND_500000000000_Proyecto_CFM">Proyecto CFM 500000000000</option>
+										<option value="SR_ND_500000002182_Proyecto_CFM">Proyecto CFM 500000002182</option>
+										<option value="SR_ND_500000000490_CFM-CTC">Proyecto CFM-CTC</option>
+										<option value="SR_ND_500000000704_CRM_Sap_Corp">Proyecto CRM Sap Corporativo</option>
+										<option value="SR_ND_PE_CNE_GGTO">Proyecto Especial CNE</option>
+										<option value="SR_ND_PE_CNE_GGTO1">Proyecto Especial CNE</option>
+										<option value="SR_ND_ND_INTERNET_TV_00">Proyecto Internet TV</option>
+										<option value="SR_ND_ND_INTERNET_TV_001">Proyecto Internet TV</option>
+										<option value="SR_ND_ND_IPTV_00">Proyecto IPTV</option>
+										<option value="SR_ND_ND_IPTV_001">Proyecto IPTV</option>
+										<option value="SR_MO_RBRA">Radio Bases y Red de Acceso</option>
+										<option value="SR_MO_RBRA_RA">Radio Bases y Red de Acceso</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_RI">Red Inteligente</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_RI1">Red Inteligente</option>
+										<option value="SR_CONS_PROPLA_RI">Red Inteligente</option>
+										<option value="SR_CONS_PROPLA_RI1">Red Inteligente</option>
+										<option value="SR_CONS_PROSER_INSTAC_RI">Red Inteligente</option>
+										<option value="SR_CONS_PROSER_RETIRO">Retiros</option>
+										<option value="SR_ND_SAT_SB">Satelite Simon Bolivar</option>
+										<option value="SR_ND_SAT_SB1">Satelite Simon Bolivar</option>
+										<option value="SR_FI">Servicios de Red Fija</option>
+										<option value="SR_MO">Servicios de Red M&oacute;vil</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVIN">Servicios Internacionales</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVTEMP">Servicios Temporales</option>
+										<option value="SR_CONS_PROSER_INSTAC_SERVER">Servicios Verticales</option>
+										<option value="SR_MO_SPCO">Spectro Conatel</option>
+										<option value="SR_MO_SPCO_SC">Spectro Conatel</option>
+										<option value="SR_MO_CCM_STP">STP</option>
+										<option value="SR_ND_OBS_ORI_TB">Telefonia Basica</option>
+										<option value="SR_ND_OBS_CAP_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_CEN_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_INS_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_OCC_TB">Telefon&iacute;a B&aacute;sica</option>
+										<option value="SR_ND_OBS_ORI_TP">Telefonia Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TP1">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TP1">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROSER_FACTEC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_CONS_PROSER_INSTAC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_CAP_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_CEN_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_INS_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_ND_OBS_OCC_TP">Telefon&iacute;a Publica</option>
+										<option value="SR_MO_TRANS">Transmision</option>
+										<option value="SR_ND_OBS_ORI_TX">Transmision</option>
+										<option value="SR_ND_OBS_CAP_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_CEN_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_INS_TX">Transmisi&oacute;n</option>
+										<option value="SR_ND_OBS_OCC_TX">Transmisi&oacute;n</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE">Transporte</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE">Transporte</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_TV">TV</option>
+										<option value="SR_CONS_PROPLA_OTSERV_TV">TV</option>
+										<option value="SR_CONS_PROPLA_OTSERV_TV1">TV</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_VIDEO">Video</option>
+										<option value="SR_CONS_PROPLA_OTSERV_VIDEO">Video</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_OTSERV_VIDCONF">Video Conferencia</option>
+										<option value="SR_CONS_PROPLA_OTSERV_VIDCONF">Video Conferencia</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_TRANSPORTE_VOZ">Voz</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ">Voz</option>
+										<option value="SR_CONS_PROPLA_TRANSPORTE_VOZ">Voz</option>
+										<option value="SR_CONS_PROPLA_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_FACTEC_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_INSTAC_VOZ">Voz</option>
+										<option value="SR_CONS_PROSER_RETIRO_VOZ">Voz</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_ACC">Voz (Acceso)</option>
+										<option value="SR_CONS_PROPLA_VOZ_ACC">Voz (Acceso)</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_CX">Voz (Cx)</option>
+										<option value="SR_CONS_PROPLA_VOZ_CX">Voz (Cx)</option>
+										<option value="SR_CONS_ASECAS_O&amp;M_VOZ_PQ">Voz (Pq)</option>
+										<option value="SR_CONS_PROPLA_VOZ_PQ">Voz (Pq)</option>
+									</select>
+
+			 <br>
+			 			 <label class="activity" for="object_Porcentaje">porc</label>
+			 <input id="Porcentaje" class="Porcentaje actividad" type="text" name="Porcentaje" value="" size="20">
+
+			<br>
+
+
+			<p id="crudItemAdd">
+				<a class="addItem_2" href="#">Agregar</a>
+			</p>
+			 <label id="status_2" class="status" ></label>
+			<br>
+			<table id="list_2"></table>
+
+		    <p id="dedata_2"  class="crudItemDelete">
+				<a class="dedata_2" href="#">Borrar</a>
+			</p>
+
+		    <input type="BUTTON"  id="ed1" value="Editar"/>
+             <input type="BUTTON" id="sved1" disabled='true' value="Guardar" />
+             <input type="BUTTON" id="cned1" disabled='true' value="Cancelar" />
+			
+			
+			
+             <script src="rowedex1.js" type="text/javascript"> </script>
+
+
+		</span>
+		
+		<p class="crudButtons">
+			<input class="navigation_button" value="Volver" type="reset">
+			<input class="navigation_button" value="Siguiente" type="submit">
+		</p>
+		
+</form>		<ul id="mainNav" class="steps">
+
+									<li class="current"><a title=""><em>Paso 1:</em><span>Contratos y contratistas</span></a></li>
+																		<li><a title=""><em>Paso 2</em><span>Otro paso:</span></a></li>
+						
+			<li class="mainNavNoBg"><a title=""><em>Paso Final:</em><span>Resumen</span></a></li>
+
+		</ul>
+		<div style="clear:both"></div>
+	</div>
+
+	<p id="data"></p>
+</div>		</div>
+
+		<div id="crudFooter">
+			Compañia Anónima Nacional Teléfonos de Venezuela. RIF: J-00124134-5.- Todos los derechos reservados
+		</div>
+
+	</body>
+</html>
