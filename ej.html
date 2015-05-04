@@ -7,12 +7,13 @@
 			var totalPorc = 0;
 			var totalGen = 0;
 
-			$("#encuestaForm").validate({
+			/*$("#encuestaForm").validate({
   				debug: true
-			});
+			});*/
+
 		    // Form de inserción de nuevos elementos
 	    	$("#encuestaForm").formwizard({ //wizard settings
-			 	formPluginEnabled: true, //Ajax is used to post the form to the server
+			 	formPluginEnabled: false, //Ajax is used to post the form to the server
 			 	validationEnabled : true, //The Validation plugin is used for validating the form at each step
 			 	focusFirstInput : true, // puts focus at the first input on each step
 			 	textSubmit: "Ver Resumen",
@@ -37,19 +38,20 @@
 				 			console.log("isLastStep:"+wizardData.isLastStep);
 				 			console.log("previousStep:"+wizardData.previousStep);
 				 			
-							if(totalGen == totalPorc){
-								$("#encuestaForm").submit(function() {
-  									return false;
-								});
-				 			}
-				 			else{
-				 			$("#status_"+currentStep).text('Las encuestas no están al 100%')
-				 			                         .css("color","red")
-				 			                         .fadeTo("fast",100)
-				 			                         .delay(1600)
-				 			                         .fadeTo("5000",0);
-				 			return false;
-				 			}
+				 			$("#encuestaForm").submit(function() {
+								if(totalGen == totalPorc){
+									return true;
+								}
+				 				else{
+				 				$("#status_"+currentStep).text('Las encuestas no están al 100%')
+				 			   		                    .css("color","red")
+				 			                         	.fadeTo("fast",100)
+				 			                         	.delay(1600)
+				 			                         	.fadeTo("5000",0);
+				 				return false;
+				 				}
+				 			});
+
 				 		}
 				 		else{
 				 			if(parseInt(values['cell.DQF']) <= 100){
