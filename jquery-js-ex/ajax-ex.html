@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>AJAX</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	
+	<script>
+		function Iniciar_XMR(){
+			if (window.XMLHttpRequest)
+				peticionHTTP = new XMLHttpRequest();
+			else
+				peticionHTTP = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
+		function realizarPeticion(url, metodo, funcion){
+			//Definir función de como actuar
+			peticionHTTP.onReadyStateChange = funcion;
+			//Realizar la petición
+			peticionHTTP.open(metodo, url, true);
+			peticionHTTP.send(null);
+		}
+
+		realizarPeticion('archivo.txt', 'GET', funcActuadora){
+			
+		}
+	</script>
+</head>
+<body>
+	
+
+
+</body>
+</html>

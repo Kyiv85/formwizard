@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Ej jquery uno más</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body>
+	
+	<script>
+	$(document).ready(function(){
+ 
+    $("#tbUsuario tr").click(function(){
+        $(this).css('background-color','black');
+        $(this).css('color','white');
+        $("#acciones").fadeIn('slow');
+        var a = $(this).childrens("td.td1").first().val();
+        alert(a);
+    });
+    $("#tbUsuario tr").mouseenter(function(){
+        $(this).css('background-color','#369');
+        $(this).css('color','white');
+    });
+    $("#tbUsuario tr").mouseleave(function(){
+        $(this).css('background-color','#F4F4F4');
+        $(this).css('color','#333');
+    });
+
+    var v=[];
+    $("tbUsuario").find('tr').each(function(){
+    	v.push($(this).find("td").text());
+    });
+console.log("Total:"+v.length);
+    for (var i = 0; i < v.length; i++) {
+    	console.log("Valor:"+v[i]);
+    };
+    
+ 
+})
+	</script>
+	
+	<table id="tbUsuario" class="tbUsuario">
+	<tr class="tr1">
+    <th id="th" class="th0">codigo</th>
+ 
+    <th id="th" class="th1">fecha</th>
+    <th id="th" class="th2">nombre</th>
+    <th id="th" class="th3">apellido</th>
+    <th id="th" class="th4">direccion</th>
+    <th id="th" class="th5">telefono</th>
+    <th id="th" class="th6">celular</th>
+ 
+    <th id="th" class="th7">correo electronico</th>
+    <th id="th" class="th8">nombre de usuario</th>
+    <th id="th" class="th9">contraseÃ±a</th>
+</tr>
+<tr class="tr2">    
+	<td class="td0">1</td>
+    <td class="td1">03/05/10</td>
+    <td class="td2">Jorge Leandro</td>
+ 
+    <td class="td3">Rodríguez Sanchez</td>
+    <td class="td4">av la molina 1007</td>
+    <td class="td5">3494092</td>
+    <td class="td6"></td>
+    <td class="td7">leandro105@hotmail.com</td>
+    <td class="td8">vipleandro</td>
+ 
+    <td class="td9">19e0ffcc359cfa67aacd3976024f99fe</td>
+</tr>
+ 
+<tr class="tr3">    
+	<td class="td0">2</td>
+    <td class="td1">03/05/10</td>
+    <td class="td2">Erasmo</td>
+    <td class="td3">Martinez Moreno</td>
+ 
+    <td class="td4">av la molina 1007</td>
+    <td class="td5"></td>
+    <td class="td6">992286121</td>
+    <td class="td7">martinez27_50@hotmail.com</td>
+    <td class="td8"></td>
+    <td class="td9"></td>
+</tr>
+ 
+<tr class="tr4">    <td class="td0">3</td>
+    <td class="td1">04/05/10</td>
+    <td class="td2">Segundino</td>
+    <td class="td3">Ramos Mamani</td>
+    <td class="td4">Av. La molina 1007</td>
+    <td class="td5"></td>
+ 
+    <td class="td6"></td>
+    <td class="td7"></td>
+    <td class="td8"></td>
+    <td class="td9"></td>
+</tr>
+ 
+<tr>    <td class="td0">4</td>
+    <td class="td1">04/05/10</td>
+    <td class="td2">Santos</td>
+ 
+    <td class="td3">Martinez Moreno</td>
+    <td class="td4">av la molina 1007</td>
+    <td class="td5"></td>
+    <td class="td6">992155912</td>
+    <td class="td7">marti8_90@hotmail.com</td>
+    <td class="td8"></td>
+    <td class="td9"></td>
+ 
+</tr>
+ 
+<tr class="tr5">    <td class="td0">5</td>
+    <td class="td1">06/05/10</td>
+    <td class="td2">Dennis </td>
+    <td class="td3">Espinoza Oros</td>
+    <td class="td4">av la molina 1007</td>
+ 
+    <td class="td5">3494092</td>
+    <td class="td6"></td>
+    <td class="td7"></td>
+    <td class="td8"></td>
+    <td class="td9"></td>
+</tr>
+ 
+<tr class="tr6">    <td class="td0">6</td>
+    <td class="td1">08/05/10</td>
+ 
+    <td class="td2">Elias </td>
+    <td class="td3">Castañeda Castro</td>
+    <td class="td4"></td>
+    <td class="td5"></td>
+    <td class="td6">993627195</td>
+    <td class="td7"></td>
+    <td class="td8"></td>
+ 
+    <td class="td9"></td>
+</tr>
+</table>
+</body>
+</html>

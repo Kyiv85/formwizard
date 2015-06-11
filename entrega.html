@@ -25,74 +25,47 @@
 				 				totalPorc.push(parseInt(values['cell.DQF']));
 
 
-
-
-
 				 			//Se forza la función de volver para que se ejecute sólo una vez, ya que se repite según la cantidad de formularios que existen
-				 			countReset = 0;
+				 			swReset = 0;
 				 			$("input:reset").click(function(){
-				 				if(countReset==0){
+				 				if(swReset==0){
 									currentStep--;
 									console.log("currentStep:"+currentStep);
-									countReset++;
+									swReset++;
 								}
 								console.log("currentStep:"+currentStep);
 							});
 
 
 
-
-
-
-
-
 				 			//Se realiza la validación al momento de realizar el envío
 				 			countSubmit = 0;
-				 			$("#encuestaForm").submit(function(){
-								console.log("Entró al submit beforeNext");
-								console.log("DQF:"+parseInt(values['cell.DQF']));
-								console.log("currentStep:"+currentStep);
+				 			$("#encuestaForm").submit(function(e){
+				 				var values = jQuery("#list_"+currentStep).jqGrid('footerData');
 								totalPorc[currentStep-1] = parseInt(values['cell.DQF']);;
 								totalGen = currentStep*100;
-								console.log("Pasó por el submit beforeNext");
-								
-								acum = 0;
+
+								var acum = 0;
 							 	for (var j=0;j<totalPorc.length;j++){
 					 				acum = acum+totalPorc[j];
-				 					console.log("Array "+(j+1)+":"+totalPorc[j]);
 				 				};
 				 				countSubmit++;
-				 				console.log("Repetición "+countSubmit);
-				 					
-								if(totalGen == acum){
-									console.log("totalGen:"+totalGen);
-									console.log("currentStep:"+currentStep);
-									console.log("Acumulado:"+acum);
 
-									for (var j=0;j<totalPorc.length;j++){
-						 				console.log("Array "+(j+1)+":"+totalPorc[j]);
-				 					};
-
-									return false;
+				 				if(totalGen == acum){
+									return true;
 								}
 				 				else{
-				 				 //if(countSubmit==0){
+				 				 if(countSubmit>1){
+				 				 	return true;
+				 				 }else{
 				 					$("#status_"+currentStep).text('Las encuestas no están al 100%')
 				 			   			                    .css("color","red")
 				 			            	             	.fadeTo("fast",100)
 				 			                	         	.delay(1600)
 				 			                    	     	.fadeTo("5000",0);
-				 			    	console.log("Acumulado:"+acum);
-				 			    	console.log("totalGen:"+totalGen);
-									console.log("currentStep:"+currentStep);
 
-									for (var j=0;j<totalPorc.length;j++){
-						 				console.log("Array "+(j+1)+":"+totalPorc[j]);
-				 					};
-
-				 					//countSubmit++;
-				 					return false;
-				 				// }
+						 			e.preventDefault();
+				 				 }
 				 				}
 				 			});
 
@@ -100,10 +73,8 @@
 				 				currentStep++;
 				 			console.log("currentStep:"+currentStep);
 				 			return true;
-
-
-				 		
-				 	}					 	
+				 		}			 		
+				 	//}					 	
 				 	else{
 				 		$("#status_"+currentStep).text('El total no debe ser mayor a 100')
 				 		   	                     .css("color","red")
@@ -115,19 +86,12 @@
 				},
 				afterNext : function(wizardData){
 					var values = jQuery("#list_"+currentStep).jqGrid('footerData');
-						if(wizardData.isLastStep){
-							console.log("Entró al isLastStep afterNext");
-				 			console.log("DQF:"+parseInt(values['cell.DQF']));
-							totalPorc[currentStep-1] = parseInt(values['cell.DQF']);
-						
-							acum = 0;
-					 		for (var j=0;j<totalPorc.length;j++){
-				 				acum = acum+totalPorc[j];
-				 				console.log("Array "+(j+1)+":"+totalPorc[j]);
-				 			};
-				 			console.log("Pasó por el isLastStep afterNext");
-						}
-
+					if(wizardData.isLastStep){
+						acum = 0;
+				 		for (var j=0;j<totalPorc.length;j++){
+							acum = acum+totalPorc[j];
+						};
+					}
 
 					next = $("li.current").next();
 					current = $("li.current");

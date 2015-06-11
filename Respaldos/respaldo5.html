@@ -25,6 +25,13 @@
 				 				totalPorc.push(parseInt(values['cell.DQF']));
 
 
+				 			
+
+
+
+				 			//vr=$('td[aria-describedby="list_'+currentStep+'_cell.DQF"]').val('td');
+				 			//alert('Valor:'+vr);
+
 
 
 
@@ -40,6 +47,24 @@
 							});
 
 
+
+
+
+				 			/*if(wizardData.isLastStep){
+									console.log("Entró al isLastStep beforeNext");
+				 					console.log("DQF:"+parseInt(jQuery("#list_"+(currentStep+1)).jqGrid('footerData')['cell.DQF']));
+									totalPorc[currentStep-1] = parseInt(values['cell.DQF']);;
+								//totalGen = currentStep*100;
+					
+								//totalPorc[currentStep-1] = parseInt(values['cell.DQF']);
+						
+								//	acum = 0;
+					 				for (var j=0;j<totalPorc.length;j++){
+				 				//		acum = acum+totalPorc[j];
+				 						console.log("Array "+(j+1)+":"+totalPorc[j]);
+				 					};
+				 					console.log("Pasó por el isLastStep beforeNext");
+							}*/
 
 
 
@@ -115,10 +140,15 @@
 				},
 				afterNext : function(wizardData){
 					var values = jQuery("#list_"+currentStep).jqGrid('footerData');
+					//$("#encuestaForm").submit(function(){
+						//console.log("Entró al submit afterNext");
 						if(wizardData.isLastStep){
 							console.log("Entró al isLastStep afterNext");
 				 			console.log("DQF:"+parseInt(values['cell.DQF']));
-							totalPorc[currentStep-1] = parseInt(values['cell.DQF']);
+							//totalPorc[currentStep-1] = parseInt(values['cell.DQF']);;
+							//totalGen = currentStep*100;
+					
+							//totalPorc[currentStep-1] = parseInt(values['cell.DQF']);
 						
 							acum = 0;
 					 		for (var j=0;j<totalPorc.length;j++){
@@ -127,6 +157,8 @@
 				 			};
 				 			console.log("Pasó por el isLastStep afterNext");
 						}
+						//console.log("Pasó por el submit afterNext");
+					//});
 
 
 					next = $("li.current").next();

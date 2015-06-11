@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Jquery Codejobs</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	
+	<script type="text/javascript">
+		/*$(document).on("ready",function(){
+			//alert("Hola carnal, soy Jquery!!!");
+			//alert("Hola tengo "+$(":input").length+" inputs")
+			//cuantos=$(":input").filter(':radio').length;
+			//alert("Hola carnal tengo "+$(":input[name='sexo']","#miId").length+" inputs");
+			//alert("Hola carnal!!!, tengo "+cuantos+" inputs");
+			var cuantos=0;
+			cuantos=$(':input').filter(':radio').end().length;
+			//alert("Hola carnal!!!, tengo "+cuantos+" inputs");
+			
+		});*/
+		$(document).on('ready',function(){
+			//alert("Hola carnal!!!, soy el id " + $("ul #dos").parents().attr('id'));
+			//alert("Hola carnal!!!, soy el id " + $("ul #dos").parents().html());
+			alert("Hola carnal!!!, tengo " + $("ul #tres").prevAll().length + " hijos");
+		});
+	</script>
+</head>
+<body>
+	<h1>Hágale al curso de jquery mijín</h1>
+	
+	<div id="ejemplos">
+	<form action="ficticio.php">
+		<input name="sexo" value="H" type="radio"/>
+		<input name="name" value="marco" type="text"/>
+		<input name="boton" value="boton1" type="button"/>
+	</form>
+
+	<form id="miId" action="ficticio.php">
+		<input name="sexo" value="H" type="radio"/>
+		<input name="name" value="marco" type="text"/>
+		<input name="boton" value="boton2" type="button"/>
+	</form>
+
+	<ul id="ul">
+		<li id="uno">uno</li>
+		<li id="dos">dos</li>
+		<li id="tres">tres</li>
+		<li id="cuatro">cuatro</li>
+	</ul>
+	</div>
+</body>
+</html>
